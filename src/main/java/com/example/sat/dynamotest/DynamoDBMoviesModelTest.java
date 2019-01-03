@@ -1,7 +1,5 @@
 package com.example.sat.dynamotest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +12,10 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.example.sat.dynamotest.model.EmbeddedJson;
-import com.example.sat.dynamotest.model.MoviesTable;
+import com.example.sat.dynamotest.model.TestObject;
 import com.example.sat.dynamotest.model.SomeJsonModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.RandomStringUtils;
 
 public class DynamoDBMoviesModelTest {
 
@@ -61,25 +60,31 @@ public class DynamoDBMoviesModelTest {
 		someJsonModel.setLastName("Test Last Name");
 		ObjectMapper objectMapper = new ObjectMapper();
 		String someJsonObj = objectMapper.writeValueAsString(someJsonModel);
-		
-		MoviesTable item = new MoviesTable();
-		item.setName("Using DynamoDBMapper");
-		item.setRating("***");
-		item.setSomeJson(someJsonObj);
-		item.setFans(new ArrayList<String>(Arrays.asList("King","Kong")));
-		item.setYear("1989");
-		mapper.save(item);          
-		
-		String queryName = "Using DynamoDBMapper";
+
+		for(int i = 0 ; i < 999 ; i++) {
+
+			int length = 10;
+			boolean useLetters = true;
+			boolean useNumbers = false;
+			String generatedString = RandomStringUtils.random(length, useLetters, useNumbers);
+
+			System.out.println(generatedString);
+			TestObject item = new TestObject();
+			item.setId(i+1);
+			item.setName(generatedString);
+			item.setStatus("NEW");
+			mapper.save(item);
+		}
+
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
-        eav.put(":val1", new AttributeValue().withS(queryName.toString()));
-        DynamoDBQueryExpression<MoviesTable> queryExpression = new DynamoDBQueryExpression<MoviesTable>()
-            .withKeyConditionExpression("movie_name = :val1").withExpressionAttributeValues(eav);
+        eav.put(":val1", new AttributeValue().withN("256"));
+        DynamoDBQueryExpression<TestObject> queryExpression = new DynamoDBQueryExpression<TestObject>()
+            .withKeyConditionExpression("empId = :val1").withExpressionAttributeValues(eav);
 
-        List<MoviesTable> latestReplies = mapper.query(MoviesTable.class, queryExpression);
+        List<TestObject> latestReplies = mapper.query(TestObject.class, queryExpression);
 
-        for (MoviesTable reply : latestReplies) {
-            System.out.println(reply.getSomeJson());
+        for (TestObject reply : latestReplies) {
+            System.out.println(reply.getName()+"---"+reply.getStatus());
         }
 	}
 
