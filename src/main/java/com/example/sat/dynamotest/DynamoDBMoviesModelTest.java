@@ -61,7 +61,7 @@ public class DynamoDBMoviesModelTest {
 		ObjectMapper objectMapper = new ObjectMapper();
 		String someJsonObj = objectMapper.writeValueAsString(someJsonModel);
 
-		for(int i = 0 ; i < 999 ; i++) {
+		for(int i = 1 ; i <=1000 ; i++) {
 
 			int length = 10;
 			boolean useLetters = true;
@@ -70,7 +70,7 @@ public class DynamoDBMoviesModelTest {
 
 			System.out.println(generatedString);
 			TestObject item = new TestObject();
-			item.setId(i+1);
+			item.setId(i);
 			item.setName(generatedString);
 			item.setStatus("NEW");
 			mapper.save(item);
